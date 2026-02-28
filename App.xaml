@@ -1,0 +1,263 @@
+﻿<Application x:Class="SteamAutoShutdown.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SteamAutoShutdown"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+
+        <!-- ═══════════ 调色板 ═══════════ -->
+        <Color x:Key="PrimaryBg">#1B2838</Color>
+        <Color x:Key="PrimaryBgLight">#213347</Color>
+        <Color x:Key="CardBg">#2A475E</Color>
+        <Color x:Key="CardBgHover">#305574</Color>
+        <Color x:Key="InputBg">#172A3A</Color>
+        <Color x:Key="InputBgFocus">#1C3248</Color>
+        <Color x:Key="AccentGreen">#5C7E10</Color>
+        <Color x:Key="AccentGreenHover">#7CA811</Color>
+        <Color x:Key="AccentGreenPressed">#4A6A0A</Color>
+        <Color x:Key="AccentBlue">#66C0F4</Color>
+        <Color x:Key="AccentBlueGlow">#3366C0F4</Color>
+        <Color x:Key="DangerRed">#CD3B3B</Color>
+        <Color x:Key="DangerRedHover">#E04848</Color>
+        <Color x:Key="DangerRedPressed">#A82E2E</Color>
+        <Color x:Key="TextPrimary">#C7D5E0</Color>
+        <Color x:Key="TextSecondary">#8F98A0</Color>
+        <Color x:Key="BorderColor">#3D6580</Color>
+        <Color x:Key="ShadowColor">#40000000</Color>
+
+        <SolidColorBrush x:Key="PrimaryBgBrush"    Color="{StaticResource PrimaryBg}"/>
+        <SolidColorBrush x:Key="CardBgBrush"        Color="{StaticResource CardBg}"/>
+        <SolidColorBrush x:Key="InputBgBrush"       Color="{StaticResource InputBg}"/>
+        <SolidColorBrush x:Key="AccentGreenBrush"   Color="{StaticResource AccentGreen}"/>
+        <SolidColorBrush x:Key="AccentBlueBrush"    Color="{StaticResource AccentBlue}"/>
+        <SolidColorBrush x:Key="DangerRedBrush"     Color="{StaticResource DangerRed}"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush"   Color="{StaticResource TextPrimary}"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
+        <SolidColorBrush x:Key="BorderBrush"        Color="{StaticResource BorderColor}"/>
+
+        <!-- 卡片阴影 -->
+        <DropShadowEffect x:Key="CardShadow" Color="{StaticResource ShadowColor}"
+                          BlurRadius="12" ShadowDepth="2" Direction="270" Opacity="0.6"/>
+        <DropShadowEffect x:Key="CardShadowHover" Color="{StaticResource ShadowColor}"
+                          BlurRadius="20" ShadowDepth="4" Direction="270" Opacity="0.75"/>
+        <DropShadowEffect x:Key="ButtonGlow" Color="{StaticResource AccentGreen}"
+                          BlurRadius="16" ShadowDepth="0" Opacity="0.45"/>
+
+        <!-- ═══════════ 主按钮 (绿色渐变) ═══════════ -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value><ScaleTransform ScaleX="1" ScaleY="1"/></Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="8" Padding="20,0"
+                                Effect="{StaticResource CardShadow}">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="{StaticResource AccentGreenHover}" Offset="0"/>
+                                    <GradientStop Color="{StaticResource AccentGreen}" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Effect" Value="{StaticResource ButtonGlow}"/>
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#8DBF18" Offset="0"/>
+                                            <GradientStop Color="{StaticResource AccentGreenHover}" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value><ScaleTransform ScaleX="0.97" ScaleY="0.97"/></Setter.Value>
+                                </Setter>
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="{StaticResource AccentGreenPressed}"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.35"/>
+                                <Setter TargetName="border" Property="Effect" Value="{x:Null}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ═══════════ 次按钮 (半透明玻璃边框) ═══════════ -->
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value><ScaleTransform ScaleX="1" ScaleY="1"/></Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="#0CFFFFFF"
+                                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1.5"
+                                CornerRadius="8" Padding="20,0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value><SolidColorBrush Color="#1A66C0F4"/></Setter.Value>
+                                </Setter>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource AccentBlueBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value><ScaleTransform ScaleX="0.97" ScaleY="0.97"/></Setter.Value>
+                                </Setter>
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value><SolidColorBrush Color="#2266C0F4"/></Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ═══════════ 危险按钮 (红色) ═══════════ -->
+        <Style x:Key="DangerButton" TargetType="Button">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource DangerRedBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value><ScaleTransform ScaleX="1" ScaleY="1"/></Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="Transparent"
+                                BorderBrush="#55CD3B3B" BorderThickness="1.5"
+                                CornerRadius="8" Padding="20,0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value><SolidColorBrush Color="#18CD3B3B"/></Setter.Value>
+                                </Setter>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource DangerRedBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value><ScaleTransform ScaleX="0.97" ScaleY="0.97"/></Setter.Value>
+                                </Setter>
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value><SolidColorBrush Color="#28CD3B3B"/></Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ═══════════ 浏览按钮 ═══════════ -->
+        <Style x:Key="BrowseButton" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentBlueBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value><ScaleTransform ScaleX="1" ScaleY="1"/></Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="#0866C0F4"
+                                BorderBrush="#5566C0F4" BorderThickness="1"
+                                CornerRadius="6" Padding="14,0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value><SolidColorBrush Color="#2266C0F4"/></Setter.Value>
+                                </Setter>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource AccentBlueBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value><ScaleTransform ScaleX="0.96" ScaleY="0.96"/></Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ═══════════ 输入框 (聚焦发光) ═══════════ -->
+        <Style x:Key="PathTextBox" TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="CaretBrush" Value="{StaticResource AccentBlueBrush}"/>
+            <Setter Property="SelectionBrush" Value="{StaticResource AccentBlueBrush}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <Border x:Name="glow" CornerRadius="6" Opacity="0"
+                                    BorderBrush="{StaticResource AccentBlueBrush}" BorderThickness="1.5">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="{StaticResource AccentBlue}"
+                                                      BlurRadius="8" ShadowDepth="0" Opacity="0.4"/>
+                                </Border.Effect>
+                            </Border>
+                            <Border x:Name="main" CornerRadius="6"
+                                    Background="{StaticResource InputBgBrush}"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                                <ScrollViewer x:Name="PART_ContentHost" Margin="0"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="glow" Property="Opacity" Value="1"/>
+                                <Setter TargetName="main" Property="BorderBrush" Value="{StaticResource AccentBlueBrush}"/>
+                                <Setter TargetName="main" Property="Background">
+                                    <Setter.Value><SolidColorBrush Color="{StaticResource InputBgFocus}"/></Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Application.Resources>
+</Application>

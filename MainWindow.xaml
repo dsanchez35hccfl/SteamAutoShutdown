@@ -1,0 +1,179 @@
+﻿<Window x:Class="SteamAutoShutdown.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Steam自动关机助手" Width="520"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize"
+        FontFamily="Segoe UI, Microsoft YaHei UI">
+
+    <!-- 渐变背景 -->
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="{StaticResource PrimaryBg}" Offset="0"/>
+            <GradientStop Color="{StaticResource PrimaryBgLight}" Offset="0.6"/>
+            <GradientStop Color="{StaticResource PrimaryBg}" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
+
+    <Grid Margin="30,20,30,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══ 标题区域 ═══ -->
+        <StackPanel Grid.Row="0" Margin="0,4,0,4">
+            <TextBlock FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}">
+                <Run Text="🎮 Steam "/> <Run Text="自动关机助手" Foreground="{StaticResource AccentBlueBrush}"/>
+            </TextBlock>
+            <TextBlock Text="下载完成后自动关机，安心挂机不操心"
+                       FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,12"/>
+            <!-- 装饰渐变线 -->
+            <Border Height="2" CornerRadius="1" Margin="0,0,0,0">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="{StaticResource AccentBlue}" Offset="0"/>
+                        <GradientStop Color="{StaticResource AccentGreen}" Offset="0.5"/>
+                        <GradientStop Color="Transparent" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+        </StackPanel>
+
+        <!-- ═══ 路径选择卡片 (带左侧蓝色条纹) ═══ -->
+        <Border Grid.Row="1" CornerRadius="10" Margin="0,12,0,0"
+                Effect="{StaticResource CardShadow}">
+            <Grid>
+                <!-- 左侧彩色条纹 -->
+                <Border CornerRadius="10,0,0,10" Width="4" HorizontalAlignment="Left"
+                        Background="{StaticResource AccentBlueBrush}"/>
+                <!-- 卡片主体 -->
+                <Border CornerRadius="10" Background="{StaticResource CardBgBrush}"
+                        Padding="22,18,18,18" Margin="4,0,0,0"
+                        BorderBrush="#18FFFFFF" BorderThickness="0,1,1,0">
+                    <StackPanel>
+                        <TextBlock FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,3">
+                            <Run Text="📂 "/> <Run Text="Steam 下载临时目录"/>
+                        </TextBlock>
+                        <TextBlock Text="通常位于 steamapps\downloading 文件夹"
+                                   FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,12"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="TxtPath" Text="D:\Program Files\Steam\steamapps\downloading"
+                                     Style="{StaticResource PathTextBox}" Margin="0,0,10,0"/>
+                            <Button x:Name="BtnBrowse" Grid.Column="1" Content="浏览..."
+                                    Style="{StaticResource BrowseButton}" Click="BtnBrowse_Click"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- ═══ 状态卡片 (带脉冲指示灯 + 左侧绿色条纹) ═══ -->
+        <Border Grid.Row="2" CornerRadius="10" Margin="0,10,0,0"
+                Effect="{StaticResource CardShadow}">
+            <Grid>
+                <!-- 左侧彩色条纹 (随状态变色) -->
+                <Border x:Name="StatusStripe" CornerRadius="10,0,0,10" Width="4"
+                        HorizontalAlignment="Left" Background="{StaticResource TextSecondaryBrush}"/>
+                <!-- 卡片主体 -->
+                <Border CornerRadius="10" Background="{StaticResource CardBgBrush}"
+                        Padding="22,14,18,14" Margin="4,0,0,0"
+                        BorderBrush="#18FFFFFF" BorderThickness="0,1,1,0">
+                    <StackPanel>
+                        <!-- 状态行：指示灯 + 状态文字 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <!-- 脉冲指示灯 -->
+                            <Grid Width="14" Height="14" Margin="0,0,12,0" VerticalAlignment="Center">
+                                <Ellipse x:Name="StatusGlow" Width="14" Height="14" Opacity="0"
+                                         Fill="{StaticResource AccentGreenBrush}">
+                                    <Ellipse.Effect>
+                                        <BlurEffect Radius="6"/>
+                                    </Ellipse.Effect>
+                                </Ellipse>
+                                <Ellipse x:Name="StatusDot" Width="10" Height="10"
+                                         Fill="{StaticResource TextSecondaryBrush}"/>
+                            </Grid>
+                            <TextBlock x:Name="TxtStatus" Text="状态: 未启动"
+                                       FontSize="18" FontWeight="Bold"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- 下载详情面板 (监测时显示) -->
+                        <StackPanel x:Name="PanelDownloadInfo" Visibility="Collapsed" Margin="0,12,0,0">
+                            <!-- 游戏名称 -->
+                            <TextBlock x:Name="TxtGameName" Text=""
+                                       FontSize="14" FontWeight="SemiBold"
+                                       Foreground="{StaticResource AccentBlueBrush}"
+                                       TextTrimming="CharacterEllipsis" Margin="0,0,0,6"/>
+                            <!-- 进度条 -->
+                            <Grid Height="6" Margin="0,0,0,6">
+                                <Border CornerRadius="3" Background="#1AFFFFFF"/>
+                                <Border x:Name="MainProgressFill" CornerRadius="3" RenderTransformOrigin="0,0.5">
+                                    <Border.RenderTransform>
+                                        <ScaleTransform ScaleX="0"/>
+                                    </Border.RenderTransform>
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="{StaticResource AccentGreen}" Offset="0"/>
+                                            <GradientStop Color="{StaticResource AccentBlue}" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                            </Grid>
+                            <!-- 进度文字 -->
+                            <TextBlock x:Name="TxtProgress" Text="等待进度信息..."
+                                       FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- ═══ 操作按钮区域 ═══ -->
+        <StackPanel Grid.Row="3" Margin="0,16,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="BtnStart" Grid.Column="0" Content="▶  开始监测"
+                        Style="{StaticResource PrimaryButton}" Click="BtnStart_Click"/>
+                <Button x:Name="BtnStop" Grid.Column="2" Content="⏹  停止监测"
+                        Style="{StaticResource SecondaryButton}" IsEnabled="False" Click="BtnStop_Click"/>
+            </Grid>
+            <Button x:Name="BtnMini" Content="📌  最小化为悬浮速度窗"
+                    Style="{StaticResource SecondaryButton}" Height="36" FontSize="13"
+                    Margin="0,10,0,0" IsEnabled="False" Click="BtnMini_Click"/>
+        </StackPanel>
+
+        <!-- ═══ 分割线 ═══ -->
+        <Border Grid.Row="4" Height="1" Margin="20,0" CornerRadius="0.5"
+                Background="{StaticResource BorderBrush}" Opacity="0.4"/>
+
+        <!-- ═══ 底部区域 (紧急按钮 + 版本号) ═══ -->
+        <Grid Grid.Row="5" Margin="0,10,0,4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Button x:Name="BtnCancelShutdown" Grid.Row="0" Content="⚠  紧急取消系统关机"
+                    Style="{StaticResource DangerButton}" Click="BtnCancelShutdown_Click"/>
+            <TextBlock Grid.Row="1" Text="v1.0  ·  下载完成自动检测  ·  60秒关机缓冲"
+                       FontSize="10.5" Foreground="{StaticResource TextSecondaryBrush}"
+                       HorizontalAlignment="Center" Margin="0,12,0,0" Opacity="0.6"/>
+        </Grid>
+    </Grid>
+</Window>
